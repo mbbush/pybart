@@ -33,6 +33,8 @@ def main():
     )
     parser.add_argument(
         '-v', '--version', action='version', version=pybart.__version__)
+    parser.add_argument(
+        '-d', '--direction', type=str, help='highlight the direction in the estimation list')
 
     # Add parsers for sub-commands
     subparsers = parser.add_subparsers(title='commands')
@@ -131,6 +133,7 @@ def display_estimates(args, parser):
     # Use the default stations if no arguments were passed in
     try:
         stations = args.stations
+        end_station = args.direction
     except AttributeError:
         stations = settings.BART_STATIONS
 
@@ -140,7 +143,7 @@ def display_estimates(args, parser):
         exit(1)
 
     with Window(settings.REFRESH_INTERVAL, settings.TOTAL_COLUMNS) as window:
-        drawer = EstimateDrawer(BART(), stations, window)
+        drawer = EstimateDrawer(BART(), stations, window, end_station)
         char = ''
 
         # Keep running until 'q' is pressed to exit or an error occurs
