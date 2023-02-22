@@ -1,6 +1,6 @@
 from datetime import datetime
 from textwrap import TextWrapper
-
+import re
 
 class EstimateDrawer(object):
     """Class for drawing BART estimates on the terminal."""
@@ -8,14 +8,16 @@ class EstimateDrawer(object):
     stations = None
     window = None
     wrapper = None
+    end_station = None
 
     prev_lines = 0
 
-    def __init__(self, bart, stations, window):
+    def __init__(self, bart, stations, window, end_station):
         self.bart = bart
         self.stations = stations
         self.window = window
         self.wrapper = TextWrapper()
+        self.end_station = end_station
 
     def _format_minutes(self, minutes):
         """Return the minutes estimate formatted with its color."""
@@ -84,8 +86,12 @@ class EstimateDrawer(object):
             for departure in station.iterfind('etd'):
                 y += 1
                 destination = departure.find('destination').text
-                self.window.addstr(y, 0, destination + ' ' * (
-                    self.window.spacing - len(destination)))
+                if self.end_station and re.match('.*' + self.end_station + '.*', destination, re.I):
+                    self.window.addstr(y, 0, destination + ' ' * (
+                        self.window.spacing - len(destination)), reverse=True)
+                else:
+                    self.window.addstr(y, 0, destination + ' ' * (
+                            self.window.spacing - len(destination)))
                 x = self.window.spacing
 
                 # Display all estimates for a destination on the same line

@@ -70,12 +70,13 @@ class Window(object):
         _, self.width = self.window.getmaxyx()
         self.spacing = self.width // self.total_columns
 
-    def addstr(self, y, x, string, color_name='', bold=False):
+    def addstr(self, y, x, string, color_name='', bold=False, reverse=False):
         """Add a string with optional color and boldness."""
         color = self._get_color(color_name)
         if bold:
             color |= curses.A_BOLD
-
+        if reverse:
+            color |= curses.A_REVERSE
         try:
             self.window.addstr(y, x, string, color)
         except curses.error:
